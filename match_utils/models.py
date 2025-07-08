@@ -106,17 +106,25 @@ def load_discr(mode, device='cpu', path: Text = '.'):
             if  "mlp.act" in name:
                 discr_layers.append(name)
                 
-    elif mode in ['dino_vitb16', 'dino_vitb8']:
-        discr = torch.hub.load('facebookresearch/dino:main', mode).to(device)
+    elif mode in ['dino_vits16', 'dino_vits8', 'dino_vitb16', 'dino_vitb8']:
+        if path and os.path.isfile(path):
+            # Load from direct weights file path
+            print(f'Loading custom weights from {path}...')    
+            discr = torch.hub.load('facebookresearch/dino:main', mode, pretrained=False)
+            discr.load_state_dict(torch.load(path, map_location='cpu'))
+            discr = discr.to(device)
+        else:
+            print("Fall back to downloading from torch hub")
+            discr = torch.hub.load('facebookresearch/dino:main', mode).to(device)
+        
         for p in discr.parameters(): 
             p.data = p.data.float() 
         
         discr_layers = []
         for name, layer in discr.named_modules():
-            if  "mlp.act" in name:
+            if "mlp.act" in name:
                 discr_layers.append(name)
-        #discr_layers = [f"blocks.{i}" for i in range(12)]
-    elif mode == "dino":
+    elif mode == "dino_resnet50":
         discr = torch.hub.load('facebookresearch/dino:main', 'dino_resnet50').to(device)
         for p in discr.parameters(): 
             p.data = p.data.float() 
@@ -126,6 +134,19 @@ def load_discr(mode, device='cpu', path: Text = '.'):
         discr_layers = [ "visual.layer1", "visual.layer2", "visual.layer3", "visual.layer4"]
         for p in discr.parameters(): 
             p.data = p.data.float()
+    elif mode == "mocov2":
+        # Load MoCo v2 model (ResNet-50 backbone)
+        discr = resnet50(num_classes=128)
+        discr.fc = torch.nn.Identity()
+        if path and os.path.isfile(path):
+            print(f'Loading custom MoCo v2 weights from {path}...')
+            discr.load_state_dict(torch.load(path, map_location='cpu'))
+        else:
+            print("No path specified for MoCo v2 weights. Using random initialization.")
+        discr = discr.to(device)
+        for p in discr.parameters():
+            p.data = p.data.float()
+        discr_layers = ["layer1", "layer2", "layer3", "layer4"]
     elif mode == "resnet50":
         discr = resnet50(num_classes=1000, pretrained='imagenet').to(device)
         discr_layers = [ "layer1", "layer2", "layer3", "layer4"]
