@@ -1,14 +1,14 @@
-import tensorflow
+# import tensorflow
 import torch
-from pytorch_pretrained_biggan import (BigGAN, one_hot_from_names, truncated_noise_sample,
-                                       save_as_images, display_in_terminal)
+# from pytorch_pretrained_biggan import (BigGAN, one_hot_from_names, truncated_noise_sample,
+#                                        save_as_images, display_in_terminal)
 from torchvision.models import resnet50
 from transformers import CLIPProcessor, CLIPModel
 import clip
 import dnnlib
 import styleganxl.legacy
 import pickle
-from stylegan2.model import Generator
+# from stylegan2.model import Generator
 from mae import load_mae
 import timm.models.vision_transformer
 from typing import Text

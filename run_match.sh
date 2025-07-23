@@ -1,1 +1,2 @@
-python match.py --device "cuda:0" --save_path "matches/random" --gan_mode "biggan" --discr_mode "dino" --batch_size 10 --epochs 10 --class 0
+#!/bin/bash
+python match.py --device "cuda:0" --gan_mode "styleganxl" --discr_mode "dino_vits16" --discr_path "/datadrive/shaden/project1/FeatureInversion/pretrained_models/dino_shaders_mixup.pth" --discr_modelname "dinoshadersmixup" --batch_size 32 --epochs 50 --class 0 
