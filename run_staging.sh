@@ -25,7 +25,7 @@ mkdir -p "$STAGEDIR"
 echo "▶️  Staging $CODE_DIR → $STAGEDIR"
 rsync -av --exclude "/matches" --exclude "/staging" "$CODE_DIR/" "$STAGEDIR/"
 
-echo "✅  Staging complete."
+echo "✅  Staging complete. Staging directory: $STAGEDIR"
 
 # 6) Loosen permissions (so you don’t hit any weird umask issues)
 chmod 777 "$STAGEDIR"
