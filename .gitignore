@@ -3,6 +3,9 @@
 # Staging directory
 /staging/
 
+# Logging dir
+/logs/
+
 # log.txt
 log.txt
 
