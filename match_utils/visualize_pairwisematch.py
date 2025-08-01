@@ -15,12 +15,16 @@ warnings.filterwarnings("ignore")
 from PIL import Image
 
 from match_utils import matching, stats, proggan, nethook, dataset, loading, plotting, layers
+import os
 
-
-
-
-def viz_matches(table, gan, discr, dataset, ganlayers, discrlayers, ganstats, discrstats, gan_mode, discr_mode, global_matches, global_scores):
-    '''Visualize matches between a GAN and one discriminative model.'''
+def viz_matches(table, gan, discr, dataset, ganlayers, discrlayers, ganstats, discrstats, gan_mode, discr_mode, global_matches, global_scores, gan_name='GAN', discr_name='Discriminator', save_dir=None):
+    '''Visualize matches between a GAN and one discriminative model.
+    
+    Args:
+        gan_name (str): Name of the GAN model for visualization
+        discr_name (str): Name of the discriminator model for visualization
+        save_dir (str, optional): Directory to save the plots. If None, plots won't be saved.
+    '''
     
     
     gan.eval()
@@ -119,7 +123,8 @@ def viz_matches(table, gan, discr, dataset, ganlayers, discrlayers, ganstats, di
                 ###Plot
                 fig=plt.figure(figsize=(13, 5))
                 plt.axis("off")
-                plt.title("Best Buddy Match Rank #" + str(rank+1)+" , Ex. "+str(ex+1)+" Global Score: "+str(round(global_scores[rank], 3)), y=0.85)
+                plt.title(f"Matches between {gan_name}, {discr_name}\n"
+                         f"Best Buddy Match Rank #{rank+1}, Ex. {ex+1} Global Score: {global_scores[rank]:.3f}", y=0.85)
 
                 logger = logging.getLogger()
                 old_level = logger.level
@@ -161,14 +166,16 @@ def viz_matches(table, gan, discr, dataset, ganlayers, discrlayers, ganstats, di
                 
                 plt.imshow(discr_act[indices[ex], discridx[1]].cpu())
 
-
-
-
-
-
-
-
                 logger.setLevel(old_level)
+                
+                # Save the plot if save_dir is provided
+                if save_dir is not None:
+                    os.makedirs(save_dir, exist_ok=True)
+                    save_path = os.path.join(save_dir, f"match_rank{rank+1:03d}_ex{ex+1}.png")
+                    plt.savefig(save_path, bbox_inches='tight', dpi=150)
+                    plt.close(fig)
+
+                plt.show()
 
             del img
             del discr_act_viz
